@@ -1,0 +1,25 @@
+[Unit]
+Description=Jackett - API Support for your favorite torrent trackers
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=system
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill jackett
+ExecStartPre=-/usr/bin/docker rm jackett
+ExecStartPre=/usr/bin/docker pull lloesche/jackett-docker
+ExecStartPre=/usr/bin/test -d /data/Jackett
+ExecStart=/usr/bin/docker run \
+          --name jackett \
+          -v /data/Jackett/config:/jackett/config \
+          -v /data/Jackett/downloads:/jackett/downloads \
+          -p 9117:9117 \
+          --dns 8.8.8.8 \
+          --dns 8.8.4.4 \
+          lloesche/jackett-docker
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
